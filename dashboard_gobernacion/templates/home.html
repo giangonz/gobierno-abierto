@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <H1>Dashboard Summary</H1>
+    <br>
+    {% for k, v in table.items %}
+        <table>
+            <colgroup span="4" class="columns"></colgroup>
+            <thead>
+                <caption> {{ k }} </caption>
+                <tr>
+                    <th>Información</th>
+                    <th>Mes Actual</th>
+                    <th>Mes Previo</th>
+                    <th>Año Previo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in v %}
+                    <tr>
+                        <td>{{ data.data }}</td>
+                        <td>{{ data.latest_month.date|date:"m/Y" }} - {{ data.latest_month.value }}</td>
+                        <td>{{ data.previous_month.date|date:"m/Y" }} - {{ data.previous_month.value }}</td>
+                        <td>{{ data.month_last_year.date|date:"m/Y" }} - {{ data.month_last_year.value }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+    {% endfor %}
+{% endblock %}
