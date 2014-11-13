@@ -1,31 +1,46 @@
 {% extends "base.html" %}
+{% load bootstrap3 %}
+{% load staticfiles %}
 
-{% block content %}
-    <H1>Dashboard Summary</H1>
-    <br>
-    {% for k, v in table.items %}
-        <table>
-            <colgroup span="4" class="columns"></colgroup>
-            <thead>
-                <caption> {{ k }} </caption>
-                <tr>
-                    <th>Información</th>
-                    <th>Mes Actual</th>
-                    <th>Mes Previo</th>
-                    <th>Año Previo</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for data in v %}
-                    <tr>
-                        <td>{{ data.data }}</td>
-                        <td>{{ data.latest_month.date|date:"m/Y" }} - {{ data.latest_month.value }}</td>
-                        <td>{{ data.previous_month.date|date:"m/Y" }} - {{ data.previous_month.value }}</td>
-                        <td>{{ data.month_last_year.date|date:"m/Y" }} - {{ data.month_last_year.value }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        <br>
-    {% endfor %}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'extra_css/grid.css' %}">
+{% endblock %}
+
+{% block bootstrap3_content %}
+    <div class="container">
+        <h1>Dashboard Summary</h1>
+        <div class="row">
+            {% for data in summary %}
+                <div class="col-md-3" style="background-color: {{ data.category_color }}">
+                    <div class="col-md-12">
+                        <h4>{{ data.data }}</h4>
+                        <p>{{ data.latest_month.value }}</p>
+                        <p>{{ data.latest_month.date|date:"m/Y" }}</p>
+                        <p>
+                            {{ data.percent_change }}%
+                            {% if data.trend_direction %}
+                                {% if data.trend_positive %}
+                                    <img src="{% static "images/arrow-up-green.svg" %}">
+                                {% else %}
+                                    <img src="{% static "images/arrow-up-red.svg" %}">
+                                {% endif %}
+                                 aumento del mismo mes del año pasado
+                            {% else %}
+                                {% if data.trend_positive %}
+                                    <img src="{% static "images/arrow-down-green.svg" %}">
+                                {% else %}
+                                    <img src="{% static "images/arrow-down-red.svg" %}">
+                                {% endif %}
+                                 redución del mismo mes del año pasado
+                            {% endif %}
+                        </p>
+                    </div>
+                    <img src="{% static data.category_icon %}"> {{ data.category }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

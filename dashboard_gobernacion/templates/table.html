@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block bootstrap3_content %}
+    <div class="container">
+        <h1>Dashboard Summary</h1>
+        <br>
+        {% for k, v in table.items %}
+            <table class="table">
+                <thead>
+                    <caption> {{ k }} </caption>
+                    <tr>
+                        <th>Información</th>
+                        <th>Mes Actual</th>
+                        <th>Mes Previo</th>
+                        <th>Año Previo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in v %}
+                        <tr>
+                            <td>{{ data.data }}</td>
+                            <td>{{ data.latest_month.date|date:"m/Y" }} - {{ data.latest_month.value }}</td>
+                            <td>{{ data.previous_month.date|date:"m/Y" }} - {{ data.previous_month.value }}</td>
+                            <td>{{ data.month_last_year.date|date:"m/Y" }} - {{ data.month_last_year.value }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+{% endblock %}
