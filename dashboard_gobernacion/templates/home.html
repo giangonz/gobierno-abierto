@@ -6,11 +6,12 @@
 {% bootstrap_javascript %}
 
 {% block extra_css %}
+    <link rel="stylesheet" href="{% static 'extra_css/style.css' %}">
     <link rel="stylesheet" href="{% static 'extra_css/grid.css' %}">
 {% endblock %}
 
 {% block bootstrap3_content %}
-    <div class="container">
+    <div class="container" id="grid-container">
         <h1>Dashboard Summary</h1>
         <div class="row">
             {% for data in summary %}
@@ -38,7 +39,7 @@
                             {% endif %}
                         </p>
                     </div>
-                    <img src="{% static data.category_icon %}"> {{ data.category }}
+                    <img src="{% static data.category_icon %}"> <a href="{% url 'category' data.category.slug %}"> {{ data.category }} </a>
                 </div>
             {% endfor %}
         </div>

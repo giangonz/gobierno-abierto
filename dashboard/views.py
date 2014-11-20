@@ -14,14 +14,17 @@ def home_view(request):
     return render_to_response('home.html', context, context_instance=RequestContext(request))
 
 
-def table_view(request):
+def category_view(request, slug):
     context = {}
     table_data = {}
 
-    for category in Category.objects.all():
-        data_points = DataPoint.objects.filter(category__name=category.name)
-        table_data[category.name] = [data_point.display_data() for data_point in data_points]
+    category = Category.objects.get(slug=slug)
 
+    data_points = DataPoint.objects.filter(category__id=category.pk).order_by('name')
+    category = Category.objects.get(pk=category.pk)
+    context['category'] = category
+
+    table_data[category.name] = [data_point.display_data() for data_point in data_points]
     context['table'] = table_data
 
     return render_to_response('table.html', context, context_instance=RequestContext(request))

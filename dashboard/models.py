@@ -1,7 +1,9 @@
 from datetime import datetime
+from django.utils.timezone import utc
 import requests
 from requests import HTTPError
 from django.db import models
+from django.core.urlresolvers import reverse
 
 # Quick hack to see colors on cards
 category_colors = {
@@ -33,11 +35,38 @@ category_icons = {
     'Seguridad Pública': 'images/security.svg',
 }
 
-class Category(models.Model):
+
+class BaseModel(models.Model):
+    enabled = models.BooleanField(default=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_disabled = models.DateTimeField(blank=True, null=True)
+
+    slug = models.SlugField(unique=True)
+
+    def save(self):
+        if not self.enabled:
+            self.disabled_date = datetime.datetime.utcnow().replace(tzinfo=utc)
+        super(BaseModel, self).save()
+
+    class Meta:
+        abstract = True
+
+
+class Category(BaseModel):
     name = models.CharField(max_length=100, verbose_name='category')
 
     def __str__(self):
         return u'%s' % self.name
+
+    def get_icon(self):
+        return category_icons[self.name]
+
+    def get_color(self):
+        return category_colors[self.name]
+
+    def get_absolute_url(self):
+        # return reverse('dashboard.views.category_view', args=[{"slug": self.slug}])
+        return reverse('category', args=[{"slug": self.slug}])
 
     class Meta:
         verbose_name = u'category'
@@ -48,7 +77,7 @@ class Category(models.Model):
 #     name = models.CharField(max_length=100, verbose_name='action')
 
 
-class DataPoint(models.Model):
+class DataPoint(BaseModel):
     name = models.CharField(max_length=100, verbose_name='data point')
     category = models.ForeignKey('Category', verbose_name='category')
     resource = models.URLField(max_length=200)
@@ -97,9 +126,15 @@ class DataPoint(models.Model):
             latest_month = data_set[0]
             previous_month = self.check_previous_month(latest_month, data_set[1])
             month_last_year = self.check_month_last_year(latest_month, data_set[-1])
+            percent_change = self.check_percent_change(float(latest_month['value']), float(month_last_year['value']))
+            trend_direction = True if percent_change > 0 else False
+            trend_positive = True if self.trend_upwards_positive else False
 
             return {'data': self.name, 'data_set': data_set, 'latest_month': latest_month,
-                    'previous_month': previous_month, 'month_last_year': month_last_year}
+                    'previous_month': previous_month, 'month_last_year': month_last_year,
+                    'category_color': category_colors[self.category.name],
+                    'category_icon': category_icons[self.category.name], 'percent_change': abs(percent_change),
+                    'trend_direction': trend_direction, 'trend_positive': trend_positive}
 
         except HTTPError as e:
             return e

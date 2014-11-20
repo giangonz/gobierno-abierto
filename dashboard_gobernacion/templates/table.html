@@ -1,31 +1,63 @@
 {% extends "base.html" %}
+{% load bootstrap3 %}
+{% load staticfiles %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'extra_css/table.css' %}">
+{% endblock %}
 
 {% block bootstrap3_content %}
-    <div class="container">
-        <h1>Dashboard Summary</h1>
+    <div class="container" id="table-container">
         <br>
         {% for k, v in table.items %}
-            <table class="table">
-                <thead>
-                    <caption> {{ k }} </caption>
-                    <tr>
-                        <th>Información</th>
-                        <th>Mes Actual</th>
-                        <th>Mes Previo</th>
-                        <th>Año Previo</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for data in v %}
-                        <tr>
-                            <td>{{ data.data }}</td>
-                            <td>{{ data.latest_month.date|date:"m/Y" }} - {{ data.latest_month.value }}</td>
-                            <td>{{ data.previous_month.date|date:"m/Y" }} - {{ data.previous_month.value }}</td>
-                            <td>{{ data.month_last_year.date|date:"m/Y" }} - {{ data.month_last_year.value }}</td>
+            <h1> <img src="{% static category.get_icon %}"> {{ k }}</h1>
+            <br>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr style="background-color: {{ category.get_color }}">
+                            <th>Información</th>
+                            <th>Mes Actual</th>
+                            <th>Valor Actual</th>
+                            <th>Mes Previo</th>
+                            <th>Valor Previo</th>
+                            <th>Año Previo</th>
+                            <th>Valor Año Previo</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for data in v %}
+                            <tr>
+                                <td>{{ data.data }}</td>
+                                <td>{{ data.latest_month.date|date:"m/Y" }}</td>
+                                <td>{{ data.latest_month.value }} -
+                                    {{ data.percent_change }}%
+                                    {% if data.trend_direction %}
+                                        {% if data.trend_positive %}
+                                            <img src="{% static "images/arrow-up-green.svg" %}">
+                                        {% else %}
+                                            <img src="{% static "images/arrow-up-red.svg" %}">
+                                        {% endif %}
+                                    {% else %}
+                                        {% if data.trend_positive %}
+                                            <img src="{% static "images/arrow-down-green.svg" %}">
+                                        {% else %}
+                                            <img src="{% static "images/arrow-down-red.svg" %}">
+                                        {% endif %}
+                                    {% endif %}
+                                </td>
+                                <td>{{ data.previous_month.date|date:"m/Y" }}</td>
+                                <td>{{ data.previous_month.value }}</td>
+                                <td>{{ data.month_last_year.date|date:"m/Y" }}</td>
+                                <td>{{ data.month_last_year.value }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         {% endfor %}
     </div>
 {% endblock %}
