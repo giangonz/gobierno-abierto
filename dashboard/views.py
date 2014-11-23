@@ -1,6 +1,6 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from .models import Category, DataPoint
+from .models import Category, DataPoint, EmbeddedVisualization
 
 
 def home_view(request):
@@ -28,6 +28,16 @@ def category_view(request, slug):
     context['table'] = table_data
 
     return render_to_response('table.html', context, context_instance=RequestContext(request))
+
+
+def visualization_view(request, slug):
+    context = {}
+
+    viz = EmbeddedVisualization.objects.get(slug=slug)
+
+    context['visualization'] = viz
+
+    return render_to_response('embedded_visualization.html', context, context_instance=RequestContext(request))
 
 
 # from django.views.generic import TemplateView

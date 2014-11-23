@@ -166,3 +166,15 @@ class DataPoint(BaseModel):
 
         except HTTPError as e:
             return e
+
+
+class EmbeddedVisualization(BaseModel):
+    name = models.CharField(max_length=100)
+    category = models.ForeignKey('Category', verbose_name='category')
+    embedded = models.TextField()
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('embedded_viz', args=[{"slug": self.slug}])
