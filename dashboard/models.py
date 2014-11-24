@@ -65,7 +65,6 @@ class Category(BaseModel):
         return category_colors[self.name]
 
     def get_absolute_url(self):
-        # return reverse('dashboard.views.category_view', args=[{"slug": self.slug}])
         return reverse('category', args=[{"slug": self.slug}])
 
     class Meta:

@@ -30,6 +30,18 @@ def category_view(request, slug):
     return render_to_response('table.html', context, context_instance=RequestContext(request))
 
 
+def category_visualization_view(request, slug):
+    context = {}
+
+    category = Category.objects.get(slug=slug)
+    context['category'] = category
+
+    category_viz = EmbeddedVisualization.objects.filter(category=category).order_by('name')
+    context['category_visualization'] = category_viz
+
+    return render_to_response('embedded_visualizations_list.html', context, context_instance=RequestContext(request))
+
+
 def visualization_view(request, slug):
     context = {}
 

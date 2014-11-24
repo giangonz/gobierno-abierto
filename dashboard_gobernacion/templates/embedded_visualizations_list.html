@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load bootstrap3 %}
+{% load staticfiles %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'extra_css/viz.css' %}">
+{% endblock %}
+
+{% block bootstrap3_content %}
+    <div class="container" id="viz-container">
+        <h1> {{ category.name }} </h1>
+        {% if  category_visualization %}
+            {% for viz in category_visualization %}
+                <ul>
+                    <li><a href="{% url 'embedded_viz' viz.slug %}"> {{ viz.name }} </a></li>
+                </ul>
+            {% endfor %}
+        {% else %}
+            <ul>
+                <li><a href="/"><strong>There are no visualizations.</strong></a></li>
+            </ul>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% load bootstrap3 %}
+{% load staticfiles %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{% static 'extra_css/style.css' %}">
+{% endblock %}
+
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">"Toggle Navigation"</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/"><img src="{% static "images/logo_cio_small.png" %}"> Gov Dashboard</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li class="active">
+                    <a href="/">Home</a>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Categories<span class="caret"></span></a>
+                  <ul class="dropdown-menu" role="menu">
+                    {% for cat in categories %}
+                        <li><a href="{% url 'category' cat.slug %}">{{ cat.name }}</a></li>
+                    {% endfor %}
+                  </ul>
+                <li class="menu-item dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Visualizations<span class="caret"></span></a>
+                  <ul class="dropdown-menu" role="menu">
+                    {% for k, v in category_visualizations.items %}
+                          <li class="menu-item dropdown dropdown-submenu">
+                              <a href="{% url 'embedded_viz_list' k.slug %}"> {{ k.name }} </a>
+                              {% if v %}
+                                  <ul class="dropdown-menu">
+                                      <li class="menu-item">
+                                        {% for i in v %}
+                                            <a href="{% url 'embedded_viz' i.slug %}">{{ i.name }}</a>
+                                        {% endfor %}
+                                      </li>
+                                  </ul>
+                              {% endif %}
+                          </li>
+                    {% endfor %}
+                  </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
