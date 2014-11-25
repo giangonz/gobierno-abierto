@@ -14,6 +14,7 @@ class CategoryAdmin(admin.ModelAdmin):
     model = Category
     form = CategoryForm
     list_display = ('name', 'enabled')
+    list_filter = ('name', 'enabled')
     view_on_site = False
 
     prepopulated_fields = {'slug': ('name', )}
@@ -41,6 +42,7 @@ class DataPointForm(forms.ModelForm):
 class DataPointAdmin(admin.ModelAdmin):
     model = DataPoint
     form = DataPointForm
+    list_filter = ('name', 'category', 'enabled', 'featured')
     list_display = ('name', 'category', 'featured')
 
     prepopulated_fields = {'slug': ('name', )}
@@ -65,6 +67,7 @@ class EmbeddedVisualizationAdmin(admin.ModelAdmin):
     model = EmbeddedVisualization
     form = EmbeddedVisualizationForm
     list_display = ('name', 'category', 'enabled')
+    list_filter = ('name', 'category', 'enabled')
 
     prepopulated_fields = {'slug': ('name', )}
 
