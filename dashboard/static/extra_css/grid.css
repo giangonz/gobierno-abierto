@@ -16,13 +16,13 @@ h4 {
   margin-top: 10px;
   margin-bottom: 0;
 }
-[class*="col-"] {
+[id="grid-container"] [class*="col-"] {
   padding: 10px;
   margin: 10px;
   background-color: #e1e1e1;
   border: 1px solid #BDBDBD;
 }
-[class*="col-"] div:first-child{
+[id="grid-container"] [class*="col-"] div:first-child{
   padding: 10px;
   margin: 10px auto;
   background-color: #ffffff;
@@ -31,10 +31,10 @@ h4 {
   max-height: 210px;
   overflow: auto;
 }
-[class*="col-"] p:nth-child(2){
+[id="grid-container"] [class*="col-"] p:nth-child(2){
   font-size: xx-large;
 }
-[class*="col-"] p:nth-child(3){
+[id="grid-container"] [class*="col-"] p:nth-child(3){
   font-size: x-small;
   color: #9b9b9b;
 }

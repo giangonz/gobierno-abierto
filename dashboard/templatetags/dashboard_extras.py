@@ -20,3 +20,8 @@ def category_menu():
     menu['category_visualizations'] = category_visualizations
 
     return menu
+
+
+@register.inclusion_tag('footer.html')
+def footer():
+    pass
