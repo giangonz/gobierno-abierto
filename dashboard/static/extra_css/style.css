@@ -51,7 +51,7 @@ a {
 /* ------------------
  styling for the footer
    ------------------   */
-footer {
+.navbar-inverse{
     background-color: #F8F8F8;
     border-top-color: #E7E7E7;
     border-top-style: solid;
