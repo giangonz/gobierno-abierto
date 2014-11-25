@@ -1,3 +1,11 @@
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 150px;
+}
 a {
     color: #000000;
 }
@@ -51,6 +59,13 @@ a {
 /* ------------------
  styling for the footer
    ------------------   */
+footer{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    min-height: 150px;
+    background-color: #F8F8F8;
+}
 .navbar-inverse{
     background-color: #F8F8F8;
     border-top-color: #E7E7E7;
