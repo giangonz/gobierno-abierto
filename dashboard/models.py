@@ -5,6 +5,10 @@ from requests import HTTPError
 from django.db import models
 from django.core.urlresolvers import reverse
 
+from dashboard_gobernacion.local_settings import APP_TOKEN
+
+headers = {"content-type": "application/json", "X-App-Token": APP_TOKEN}
+
 # Quick hack to see colors on cards
 category_colors = {
     'Desarrollo e Infraestructura': '#80cbc4',
@@ -115,9 +119,10 @@ class DataPoint(BaseModel):
     def display_data(self):
         #Bring the current month plus year, for comparing and charting.
         try:
+
             data_request = '%s?$select=%s, %s&$order=%s DESC&$limit=13' % (self.resource, self.date_field,
                                                                            self.data_field, self.date_field)
-            r = requests.get(data_request)
+            r = requests.get(data_request, headers=headers)
             r.raise_for_status()
 
             data_set = [{'date': datetime.strptime(x[self.date_field][:10], '%Y-%m-%d'),
@@ -142,7 +147,7 @@ class DataPoint(BaseModel):
         try:
             data_request = '%s?$select=%s, %s&$order=%s DESC&$limit=13' % (self.resource, self.date_field,
                                                                            self.data_field, self.date_field)
-            r = requests.get(data_request)
+            r = requests.get(data_request, headers=headers)
             r.raise_for_status()
 
             data_set = [{'date': datetime.strptime(x[self.date_field][:10], '%Y-%m-%d'),
