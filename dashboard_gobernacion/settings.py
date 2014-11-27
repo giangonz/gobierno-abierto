@@ -16,19 +16,13 @@ TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 
 GRAPPELLI_ADMIN_TITLE = 'Gov Dashboard Admin'
 
+DEBUG = False
+TEMPLATE_DEBUG = False
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'lt6baiiv%7&2nmq@l=)^bjec(9$-i5bel(d2%knt8eun9a%pz='
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -91,3 +85,15 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
+
+##################
+# LOCAL SETTINGS #
+##################
+
+# Allow any settings to be defined in local_settings.py which should be
+# ignored in your version control system allowing for settings to be
+# defined per machine.
+try:
+    from .local_settings import *
+except ImportError:
+    pass
