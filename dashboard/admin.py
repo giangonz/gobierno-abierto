@@ -42,8 +42,8 @@ class DataPointForm(forms.ModelForm):
 class DataPointAdmin(admin.ModelAdmin):
     model = DataPoint
     form = DataPointForm
-    list_filter = ('name', 'category', 'enabled', 'featured')
-    list_display = ('name', 'category', 'featured')
+    list_filter = ('name', 'category', 'enabled', 'featured', 'trend_upwards_positive')
+    list_display = ('name', 'category', 'featured', 'trend_upwards_positive')
 
     prepopulated_fields = {'slug': ('name', )}
 
