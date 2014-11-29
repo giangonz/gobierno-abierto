@@ -61,7 +61,7 @@ class BaseModel(models.Model):
 class Category(BaseModel):
     name = models.CharField(max_length=100, verbose_name='category')
 
-    def __str__(self):
+    def __unicode__(self):
         return u'%s' % self.name
 
     def get_icon(self):
@@ -94,7 +94,7 @@ class DataPoint(BaseModel):
     trend_upwards_positive = models.BooleanField(default=False, verbose_name='upward trend positive?')
     featured = models.BooleanField(default=False, verbose_name='featured set?')
 
-    def __str__(self):
+    def __unicode__(self):
         return u'%s' % self.name
 
     def check_previous_month(self, latest_month, previous_month):
@@ -179,7 +179,7 @@ class EmbeddedVisualization(BaseModel):
     category = models.ForeignKey('Category', verbose_name='category')
     embedded = models.TextField()
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     def get_absolute_url(self):
