@@ -19,8 +19,8 @@ GRAPPELLI_ADMIN_TITLE = 'Gov Dashboard Admin'
 SECRET_KEY = os.environ['SECRET_KEY']
 APP_TOKEN = os.environ['APP_TOKEN']
 
-DEBUG = False
-TEMPLATE_DEBUG = False
+DEBUG = os.environ['DEBUG']
+TEMPLATE_DEBUG = os.environ['TEMPLATE_DEBUG']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
