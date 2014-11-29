@@ -1,0 +1,21 @@
+[id="table-container"]{
+  margin-top: 40px;
+}
+h1 img {
+    min-height: 5%;
+    min-width: 5%;
+    max-height: 5%;
+    max-width: 5%;
+}
+th {
+    text-align: center;
+}
+td {
+    text-align: center;
+}
+td img {
+    max-height: 15%;
+    max-width: 15%;
+    min-height: 15%;
+    min-width: 15%;
+}
