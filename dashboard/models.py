@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from datetime import datetime
 from django.utils.timezone import utc
 import requests
@@ -11,32 +13,32 @@ headers = {"content-type": "application/json", "X-App-Token": APP_TOKEN}
 
 # Quick hack to see colors on cards
 category_colors = {
-    'Desarrollo e Infraestructura': '#80cbc4',
-    'Transportación': '#e6ee9c',
-    'Turismo': '#ffe082',
-    'Economía y Finanzas': '#c5e1a5',
-    'Salud': '#ef9a9a',
-    'Educación': '#ffcc80',
-    'Negocios y Corporaciones': '#ffab91',
-    'Familia y Servicio Social': '#fff59d',
-    'Tecnologias': '#9fa8da',
-    'Permisos y Ambiente': '#a5d6a7',
-    'Seguridad Pública': '#b0bec5',
+    u'Desarrollo e Infraestructura': '#80cbc4',
+    u'Transportación': '#e6ee9c',
+    u'Turismo': '#ffe082',
+    u'Economía y Finanzas': '#c5e1a5',
+    u'Salud': '#ef9a9a',
+    u'Educación': '#ffcc80',
+    u'Negocios y Corporaciones': '#ffab91',
+    u'Familia y Servicio Social': '#fff59d',
+    u'Tecnologias': '#9fa8da',
+    u'Permisos y Ambiente': '#a5d6a7',
+    u'Seguridad Pública': '#b0bec5',
 }
 
 # Quick hack to see icons on cards
 category_icons = {
-    'Desarrollo e Infraestructura': 'images/lightbulb.svg',
-    'Transportación': 'images/traffic-light.svg',
-    'Turismo': 'images/white-balance-sunny.svg',
-    'Economía y Finanzas': 'images/cash.svg',
-    'Salud': 'images/hospital.svg',
-    'Educación': 'images/school.svg',
-    'Negocios y Corporaciones': 'images/wallet-travel.svg',
-    'Familia y Servicio Social': 'images/human.svg ',
-    'Tecnologias': 'images/laptop.svg',
-    'Permisos y Ambiente': 'images/file-document-box.svg',
-    'Seguridad Pública': 'images/security.svg',
+    u'Desarrollo e Infraestructura': 'images/lightbulb.svg',
+    u'Transportación': 'images/traffic-light.svg',
+    u'Turismo': 'images/white-balance-sunny.svg',
+    u'Economía y Finanzas': 'images/cash.svg',
+    u'Salud': 'images/hospital.svg',
+    u'Educación': 'images/school.svg',
+    u'Negocios y Corporaciones': 'images/wallet-travel.svg',
+    u'Familia y Servicio Social': 'images/human.svg ',
+    u'Tecnologias': 'images/laptop.svg',
+    u'Permisos y Ambiente': 'images/file-document-box.svg',
+    u'Seguridad Pública': 'images/security.svg',
 }
 
 
