@@ -17,6 +17,8 @@ TEMPLATE_DIRS = (os.path.join(BASE_DIR, 'templates'),)
 GRAPPELLI_ADMIN_TITLE = 'Gov Dashboard Admin'
 
 SECRET_KEY = os.environ['SECRET_KEY']
+APP_TOKEN = os.environ['APP_TOKEN']
+
 DEBUG = False
 TEMPLATE_DEBUG = False
 

@@ -7,7 +7,7 @@ from requests import HTTPError
 from django.db import models
 from django.core.urlresolvers import reverse
 
-from dashboard_gobernacion.local_settings import APP_TOKEN
+from dashboard_gobernacion.settings import APP_TOKEN
 
 headers = {"content-type": "application/json", "X-App-Token": APP_TOKEN}
 
