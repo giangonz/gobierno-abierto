@@ -7,9 +7,6 @@ from requests import HTTPError
 from django.db import models
 from django.core.urlresolvers import reverse
 
-from dashboard_gobernacion.settings import APP_TOKEN
-
-headers = {"content-type": "application/json", "X-App-Token": APP_TOKEN}
 
 # Quick hack to see colors on cards
 category_colors = {
@@ -118,12 +115,15 @@ class DataPoint(BaseModel):
 
         return round(percent_change, 2)
 
-    def display_data(self):
+    def display_data(self, token):
         #Bring the current month plus year, for comparing and charting.
         try:
 
             data_request = '%s?$select=%s, %s&$order=%s DESC&$limit=13' % (self.resource, self.date_field,
                                                                            self.data_field, self.date_field)
+
+            headers = {"content-type": "application/json", "Authorization": "OAuth " + token}
+
             r = requests.get(data_request, headers=headers)
             r.raise_for_status()
 
@@ -145,10 +145,13 @@ class DataPoint(BaseModel):
         except HTTPError as e:
             return e
 
-    def display_summary(self):
+    def display_summary(self, token):
         try:
             data_request = '%s?$select=%s, %s&$order=%s DESC&$limit=13' % (self.resource, self.date_field,
                                                                            self.data_field, self.date_field)
+
+            headers = {"content-type": "application/json", "Authorization": "OAuth " + token}
+
             r = requests.get(data_request, headers=headers)
             r.raise_for_status()
 

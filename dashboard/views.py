@@ -1,13 +1,22 @@
-from django.shortcuts import render_to_response
+from django.core.urlresolvers import reverse
+from django.http import Http404
+from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from .models import Category, DataPoint, EmbeddedVisualization
+from requests_oauthlib import OAuth2Session
+from dashboard_gobernacion.settings import CLIENT_ID, CLIENT_SECRET, AUTHORIZE_URL, TOKEN_URL
 
 
 def home_view(request):
+    token = request.session.get('token', False)
+
+    if not token:
+        return redirect('authorize')
+
     context = {}
 
     data_points = DataPoint.objects.filter(featured=True).order_by('name')
-    summary_data = [data_point.display_summary() for data_point in data_points]
+    summary_data = [data_point.display_summary(token) for data_point in data_points]
 
     context['summary'] = sorted(summary_data, key=lambda item: item['latest_month']['date'], reverse=True)
 
@@ -15,6 +24,11 @@ def home_view(request):
 
 
 def category_view(request, slug):
+    token = request.session.get('token', False)
+
+    if not token:
+        return redirect('authorize')
+
     context = {}
     table_data = {}
 
@@ -24,13 +38,18 @@ def category_view(request, slug):
     category = Category.objects.get(pk=category.pk)
     context['category'] = category
 
-    table_data[category.name] = [data_point.display_data() for data_point in data_points]
+    table_data[category.name] = [data_point.display_data(token) for data_point in data_points]
     context['table'] = table_data
 
     return render_to_response('table.html', context, context_instance=RequestContext(request))
 
 
 def category_visualization_view(request, slug):
+    token = request.session.get('token', False)
+
+    if not token:
+        return redirect('authorize')
+
     context = {}
 
     category = Category.objects.get(slug=slug)
@@ -43,6 +62,11 @@ def category_visualization_view(request, slug):
 
 
 def visualization_view(request, slug):
+    token = request.session.get('token', False)
+
+    if not token:
+        return redirect('authorize')
+
     context = {}
 
     viz = EmbeddedVisualization.objects.get(slug=slug)
@@ -50,6 +74,31 @@ def visualization_view(request, slug):
     context['visualization'] = viz
 
     return render_to_response('embedded_visualization.html', context, context_instance=RequestContext(request))
+
+
+def socrata_authorize_view(request):
+    redirect_uri = request.build_absolute_uri(reverse('callback'))
+
+    oauth = OAuth2Session(CLIENT_ID, redirect_uri=redirect_uri)
+    authorization_url, state = oauth.authorization_url(AUTHORIZE_URL)
+
+    return redirect(authorization_url)
+
+
+def socrata_callback_view(request):
+    state = request.GET.get('state')
+    code = request.GET.get('code')
+
+    if not code:
+        raise Http404
+
+    oauth2 = OAuth2Session(CLIENT_ID, state=state)
+    token = oauth2.fetch_token(token_url=TOKEN_URL, client_secret=CLIENT_SECRET, code=code)
+
+    request.session['token'] = token
+
+    return redirect('home')
+
 
 
 # from django.views.generic import TemplateView
