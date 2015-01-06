@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from .models import Category, DataPoint, EmbeddedVisualization
 from requests_oauthlib import OAuth2Session
+from oauthlib.oauth2.rfc6749.errors import MissingTokenError
 from dashboard_gobernacion.settings import CLIENT_ID, CLIENT_SECRET, AUTHORIZE_URL, TOKEN_URL
 
 
@@ -20,7 +21,7 @@ def home_view(request):
         token = request.session.get('token', False)
 
         if not token:
-            raise TokenMissingError('Token missing')
+            raise TokenMissingError('Token missing at home view')
 
         context = {}
 
@@ -28,7 +29,7 @@ def home_view(request):
         summary_data = [data_point.display_summary(token) for data_point in data_points]
 
         if 403 or 404 in summary_data:
-            raise SocrataAccessError('Socrata Access Error')
+            raise SocrataAccessError('Socrata 403 or 404 Access Error')
 
         context['summary'] = sorted(summary_data, key=lambda item: item['latest_month']['date'], reverse=True)
 
@@ -103,9 +104,12 @@ def socrata_callback_view(request):
         raise Http404
 
     oauth2 = OAuth2Session(CLIENT_ID, state=state)
-    token = oauth2.fetch_token(token_url=TOKEN_URL, client_secret=CLIENT_SECRET, code=code)
 
-    request.session['token'] = token
+    try:
+        token = oauth2.fetch_token(token_url=TOKEN_URL, client_secret=CLIENT_SECRET, code=code)
+        request.session['token'] = token
+    except MissingTokenError:
+        return redirect('authorize')
 
     return redirect('home')
 
