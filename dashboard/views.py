@@ -34,7 +34,10 @@ def home_view(request):
 
         return render_to_response('home.html', context, context_instance=RequestContext(request))
 
-    except TokenMissingError or SocrataAccessError:
+    except TokenMissingError:
+        return redirect('authorize')
+
+    except SocrataAccessError:
         return redirect('authorize')
 
 
