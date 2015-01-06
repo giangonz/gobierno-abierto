@@ -97,13 +97,14 @@ def socrata_authorize_view(request):
 
 
 def socrata_callback_view(request):
-    state = request.GET.get('state')
+    # state = request.GET.get('state')
     code = request.GET.get('code')
 
     if not code:
         raise Http404
 
-    oauth2 = OAuth2Session(CLIENT_ID, state=state)
+    # oauth2 = OAuth2Session(CLIENT_ID, state=state)
+    oauth2 = OAuth2Session(CLIENT_ID)
 
     try:
         token = oauth2.fetch_token(token_url=TOKEN_URL, client_secret=CLIENT_SECRET, code=code)
