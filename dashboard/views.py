@@ -5,6 +5,7 @@ from django.template import RequestContext
 from .models import Category, DataPoint, EmbeddedVisualization
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2.rfc6749.errors import MissingTokenError
+import logging
 from dashboard_gobernacion.settings import CLIENT_ID, CLIENT_SECRET, AUTHORIZE_URL, TOKEN_URL
 
 
@@ -36,9 +37,11 @@ def home_view(request):
         return render_to_response('home.html', context, context_instance=RequestContext(request))
 
     except TokenMissingError:
+        logging.error(TokenMissingError)
         return redirect('authorize')
 
     except SocrataAccessError:
+        logging.error(SocrataAccessError)
         return redirect('authorize')
 
 
@@ -97,14 +100,13 @@ def socrata_authorize_view(request):
 
 
 def socrata_callback_view(request):
-    # state = request.GET.get('state')
+    state = request.GET.get('state')
     code = request.GET.get('code')
 
     if not code:
         raise Http404
 
-    # oauth2 = OAuth2Session(CLIENT_ID, state=state)
-    oauth2 = OAuth2Session(CLIENT_ID)
+    oauth2 = OAuth2Session(CLIENT_ID, state=state)
 
     try:
         token = oauth2.fetch_token(token_url=TOKEN_URL, client_secret=CLIENT_SECRET, code=code)
