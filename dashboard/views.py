@@ -7,20 +7,35 @@ from requests_oauthlib import OAuth2Session
 from dashboard_gobernacion.settings import CLIENT_ID, CLIENT_SECRET, AUTHORIZE_URL, TOKEN_URL
 
 
+class SocrataAccessError(Exception):
+    pass
+
+
+class TokenMissingError(Exception):
+    pass
+
+
 def home_view(request):
-    token = request.session.get('token', False)
+    try:
+        token = request.session.get('token', False)
 
-    if not token:
+        if not token:
+            raise TokenMissingError('Token missing')
+
+        context = {}
+
+        data_points = DataPoint.objects.filter(featured=True).order_by('name')
+        summary_data = [data_point.display_summary(token) for data_point in data_points]
+
+        if 403 or 404 in summary_data:
+            raise SocrataAccessError('Socrata Access Error')
+
+        context['summary'] = sorted(summary_data, key=lambda item: item['latest_month']['date'], reverse=True)
+
+        return render_to_response('home.html', context, context_instance=RequestContext(request))
+
+    except TokenMissingError or SocrataAccessError:
         return redirect('authorize')
-
-    context = {}
-
-    data_points = DataPoint.objects.filter(featured=True).order_by('name')
-    summary_data = [data_point.display_summary(token) for data_point in data_points]
-
-    context['summary'] = sorted(summary_data, key=lambda item: item['latest_month']['date'], reverse=True)
-
-    return render_to_response('home.html', context, context_instance=RequestContext(request))
 
 
 def category_view(request, slug):
@@ -45,10 +60,6 @@ def category_view(request, slug):
 
 
 def category_visualization_view(request, slug):
-    token = request.session.get('token', False)
-
-    if not token:
-        return redirect('authorize')
 
     context = {}
 
@@ -62,10 +73,6 @@ def category_visualization_view(request, slug):
 
 
 def visualization_view(request, slug):
-    token = request.session.get('token', False)
-
-    if not token:
-        return redirect('authorize')
 
     context = {}
 

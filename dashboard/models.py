@@ -143,7 +143,8 @@ class DataPoint(BaseModel):
                     'trend_direction': trend_direction, 'trend_positive': trend_positive}
 
         except HTTPError as e:
-            return e
+            status_code = e.response.status_code
+            return status_code
 
     def display_summary(self, token):
         try:
@@ -174,7 +175,8 @@ class DataPoint(BaseModel):
                     'category_icon': category_icons[self.category.name]}
 
         except HTTPError as e:
-            return e
+            status_code = e.response.status_code
+            return status_code
 
 
 class EmbeddedVisualization(BaseModel):
