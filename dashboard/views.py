@@ -29,7 +29,7 @@ def home_view(request):
         data_points = DataPoint.objects.filter(featured=True).order_by('name')
         summary_data = [data_point.display_summary(token) for data_point in data_points]
 
-        if 403 or 404 in summary_data:
+        if 403 in summary_data:
             raise SocrataAccessError('Socrata 403 or 404 Access Error')
 
         context['summary'] = sorted(summary_data, key=lambda item: item['latest_month']['date'], reverse=True)
