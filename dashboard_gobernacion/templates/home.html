@@ -18,7 +18,7 @@
                 <div class="col-md-3" style="background-color: {{ data.category_color }}">
                     <div class="col-md-12">
                         <h4>{{ data.data }}</h4>
-                        <p>{{ data.latest_month.value }}</p>
+                        <p>{{ data.latest_month.value|intcomma }}</p>
                         <p>{{ data.latest_month.date|date:"m/Y" }}</p>
                         <p>
                             {{ data.percent_change }}%
