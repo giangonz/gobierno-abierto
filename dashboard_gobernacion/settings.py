@@ -22,8 +22,10 @@ CLIENT_SECRET = os.environ['CLIENT_SECRET']
 AUTHORIZE_URL = os.environ['AUTHORIZE_URL']
 TOKEN_URL = os.environ['TOKEN_URL']
 
-DEBUG = os.environ['DEBUG']
-TEMPLATE_DEBUG = os.environ['TEMPLATE_DEBUG']
+# DEBUG = os.environ['DEBUG']
+# TEMPLATE_DEBUG = os.environ['TEMPLATE_DEBUG']
+DEBUG = True
+TEMPLATE_DEBUG = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -119,7 +121,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/django.log'),
-            'maxBytes': '16777216',
+            'maxBytes': 16777216,
             'formatter': 'verbose'
         },
         'mail_admins': {
