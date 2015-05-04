@@ -2,6 +2,7 @@
 
 from datetime import datetime
 from django.utils.timezone import utc
+from django.utils.text import slugify
 import requests
 from requests import HTTPError
 from django.db import models
@@ -46,9 +47,9 @@ class BaseModel(models.Model):
 
     slug = models.SlugField(unique=True)
 
-    def save(self):
+    def save(self, force_insert=False, force_update=False, using=None):
         if not self.enabled:
-            self.disabled_date = datetime.datetime.utcnow().replace(tzinfo=utc)
+            self.disabled_date = datetime.utcnow().replace(tzinfo=utc)
         super(BaseModel, self).save()
 
     class Meta:
@@ -68,7 +69,11 @@ class Category(BaseModel):
         return category_colors[self.name]
 
     def get_absolute_url(self):
-        return reverse('category', args=[{"slug": self.slug}])
+        return reverse('category', kwargs={'slug': self.slug})
+
+    def save(self, force_insert=False, force_update=False, using=None):
+        self.slug = slugify(self.name, )
+        super(Category, self).save()
 
     class Meta:
         verbose_name = u'category'
@@ -115,20 +120,32 @@ class DataPoint(BaseModel):
 
         return round(percent_change, 2)
 
-    def display_data(self, token):
-        #Bring the current month plus year, for comparing and charting.
+    def get_data(self):
         try:
-
             data_request = '%s?$select=%s, %s&$order=%s DESC&$limit=13' % (self.resource, self.date_field,
                                                                            self.data_field, self.date_field)
 
-            headers = {"content-type": "application/json", "Authorization": "OAuth " + token['access_token']}
+            # headers = {"content-type": "application/json", "Authorization": "OAuth " + token['access_token']}
+            headers = {"content-type": "application/json", }
 
             r = requests.get(data_request, headers=headers)
             r.raise_for_status()
 
+            return r
+
+        except HTTPError as e:
+            status_code = e.response.status_code
+            return status_code
+
+    # def display_data(self, token):
+    def display_data(self):
+        #Bring the current month plus year, for comparing and charting.
+        try:
+
+            data_request = self.get_data()
+
             data_set = [{'date': datetime.strptime(x[self.date_field][:10], '%Y-%m-%d'),
-                         'value': x[self.data_field]} for x in r.json()]
+                         'value': x[self.data_field]} for x in data_request.json()]
             latest_month = data_set[0]
             previous_month = self.check_previous_month(latest_month, data_set[1])
             month_last_year = self.check_month_last_year(latest_month, data_set[-1])
@@ -146,18 +163,14 @@ class DataPoint(BaseModel):
             status_code = e.response.status_code
             return status_code
 
-    def display_summary(self, token):
+    # def display_summary(self, token):
+    def display_summary(self):
         try:
-            data_request = '%s?$select=%s, %s&$order=%s DESC&$limit=13' % (self.resource, self.date_field,
-                                                                           self.data_field, self.date_field)
 
-            headers = {"content-type": "application/json", "Authorization": "OAuth " + token['access_token']}
-
-            r = requests.get(data_request, headers=headers)
-            r.raise_for_status()
+            data_request = self.get_data()
 
             data_set = [{'date': datetime.strptime(x[self.date_field][:10], '%Y-%m-%d'),
-                         'value': x[self.data_field]} for x in r.json()]
+                         'value': x[self.data_field]} for x in data_request.json()]
             latest_month = data_set[0]
             month_last_year = self.check_month_last_year(latest_month, data_set[-1])
             percent_change = self.check_percent_change(float(latest_month['value']), float(month_last_year['value']))
@@ -188,4 +201,8 @@ class EmbeddedVisualization(BaseModel):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('embedded_viz', args=[{"slug": self.slug}])
+        return reverse('embedded_viz', kwargs={'slug': self.slug})
+
+    def save(self, force_insert=False, force_update=False, using=None):
+        self.slug = slugify(self.name, )
+        super(EmbeddedVisualization, self).save()
