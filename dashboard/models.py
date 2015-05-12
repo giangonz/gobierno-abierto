@@ -99,34 +99,37 @@ class DataPoint(BaseModel):
     def __unicode__(self):
         return u'%s' % self.name
 
-    def check_previous_month(self, latest_month, previous_month):
+    @staticmethod
+    def check_previous_month(latest_month, previous_month):
         if ((latest_month['date'].month-1) == previous_month['date'].month) and \
                 (latest_month['date'].year == previous_month['date'].year):
             return previous_month
         else:
             return None
 
-    def check_month_last_year(self, latest_month, month_last_year):
+    @staticmethod
+    def check_month_last_year(latest_month, month_last_year):
         if (latest_month['date'].month == month_last_year['date'].month) and \
                 ((latest_month['date'].year-1) == month_last_year['date'].year):
             return month_last_year
         else:
             return None
 
-    def check_percent_change(self, latest_month, month_last_year):
+    @staticmethod
+    def check_percent_change(latest_month, month_last_year):
         change = latest_month - month_last_year
 
         percent_change = (change / month_last_year) * 100
 
         return round(percent_change, 2)
 
-    def get_data(self):
+    def get_data(self, token):
         try:
             data_request = '%s?$select=%s, %s&$order=%s DESC&$limit=13' % (self.resource, self.date_field,
                                                                            self.data_field, self.date_field)
 
             # headers = {"content-type": "application/json", "Authorization": "OAuth " + token['access_token']}
-            headers = {"content-type": "application/json", }
+            headers = {"content-type": "application/json"}
 
             r = requests.get(data_request, headers=headers)
             r.raise_for_status()
@@ -135,14 +138,13 @@ class DataPoint(BaseModel):
 
         except HTTPError as e:
             status_code = e.response.status_code
-            return status_code
+            return {'status_code': status_code, 'name': self.name}
 
-    # def display_data(self, token):
-    def display_data(self):
+    def display_data(self, token):
         #Bring the current month plus year, for comparing and charting.
         try:
 
-            data_request = self.get_data()
+            data_request = self.get_data(token)
 
             data_set = [{'date': datetime.strptime(x[self.date_field][:10], '%Y-%m-%d'),
                          'value': x[self.data_field]} for x in data_request.json()]
@@ -159,15 +161,20 @@ class DataPoint(BaseModel):
                     'category_icon': category_icons[self.category.name], 'percent_change': abs(percent_change),
                     'trend_direction': trend_direction, 'trend_positive': trend_positive}
 
-        except HTTPError as e:
-            status_code = e.response.status_code
-            return status_code
+            # return {'data': self.name, 'data_set': data_set, 'latest_month': latest_month,
+            #         'previous_month': previous_month, 'month_last_year': month_last_year,
+            #         'percent_change': abs(percent_change), 'trend_direction': trend_direction,
+            #         'trend_positive': trend_positive}
 
-    # def display_summary(self, token):
-    def display_summary(self):
+        except ValueError:
+            return 'Incorrect date format'
+        except ArithmeticError:
+            return 'Incorrect calculation'
+
+    def display_summary(self, token):
         try:
 
-            data_request = self.get_data()
+            data_request = self.get_data(token)
 
             data_set = [{'date': datetime.strptime(x[self.date_field][:10], '%Y-%m-%d'),
                          'value': x[self.data_field]} for x in data_request.json()]
@@ -187,9 +194,14 @@ class DataPoint(BaseModel):
                     'category': self.category, 'category_color': category_colors[self.category.name],
                     'category_icon': category_icons[self.category.name]}
 
-        except HTTPError as e:
-            status_code = e.response.status_code
-            return status_code
+            # return {'data': self.name, 'latest_month': latest_month, 'percent_change': abs(percent_change),
+            #         'trend_direction': trend_direction, 'trend_positive': trend_positive,
+            #         'category': self.category}
+
+        except ValueError:
+            return 'Incorrect date format'
+        except ArithmeticError:
+            return 'Incorrect calculation'
 
 
 class EmbeddedVisualization(BaseModel):

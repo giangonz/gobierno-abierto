@@ -17,53 +17,65 @@ class TokenMissingError(Exception):
     pass
 
 
+def get_token(request):
+    try:
+        token = request.session.get('token', False)
+
+        if not token:
+            raise TokenMissingError('Token missing')
+
+        return token
+
+    except TokenMissingError:
+        logging.error(TokenMissingError('Token missing'))
+        raise
+
+
 def home_view(request):
     try:
-        # token = request.session.get('token', False)
-        #
-        # if not token:
-        #     raise TokenMissingError('Token missing at home view')
+        # token = get_token(request)
+        token = '123'
 
         context = {}
 
         data_points = DataPoint.objects.filter(featured=True).order_by('name')
-        summary_data = [data_point.display_summary() for data_point in data_points]
+        summary_data = [data_point.display_summary(token) for data_point in data_points]
 
-        # if 403 in summary_data:
-        #     raise SocrataAccessError('Socrata 403 or 404 Access Error')
+        if 403 in summary_data:
+            raise SocrataAccessError('Socrata 403 or 404 Access Error')
 
         context['summary'] = sorted(summary_data, key=lambda item: item['latest_month']['date'], reverse=True)
 
         return render_to_response('home.html', context, context_instance=RequestContext(request))
 
     except TokenMissingError:
-        logging.error(TokenMissingError)
         return redirect('authorize')
-
     except SocrataAccessError:
         logging.error(SocrataAccessError)
         return redirect('authorize')
 
 
 def category_view(request, slug):
-    # token = request.session.get('token', False)
-    #
-    # if not token:
-    #     return redirect('authorize')
+    try:
+        # token = get_token(request)
+        token = '123'
 
-    context = {}
-    table_data = {}
+        context = {}
+        table_data = {}
 
-    category = Category.objects.get(slug=slug)
+        category = Category.objects.get(slug=slug)
 
-    data_points = DataPoint.objects.filter(category__id=category.pk).order_by('name')
-    category = Category.objects.get(pk=category.pk)
-    context['category'] = category
+        data_points = DataPoint.objects.filter(category__id=category.pk).order_by('name')
+        category = Category.objects.get(pk=category.pk)
+        context['category'] = category
 
-    table_data[category.name] = [data_point.display_data() for data_point in data_points]
-    context['table'] = table_data
+        table_data[category.name] = [data_point.display_data(token) for data_point in data_points]
+        context['table'] = table_data
 
-    return render_to_response('table.html', context, context_instance=RequestContext(request))
+        return render_to_response('table.html', context, context_instance=RequestContext(request))
+
+    except TokenMissingError:
+        return redirect('authorize')
 
 
 def category_visualization_view(request, slug):
@@ -115,17 +127,3 @@ def socrata_callback_view(request):
         return redirect('authorize')
 
     return redirect('home')
-
-
-
-# from django.views.generic import TemplateView
-#
-#
-# class HomeView(TemplateView):
-#     template_name = 'home.html'
-
-# context = {}
-#
-# for category in Category.objects.all():
-#     data_points = DataPoint.objects.filter(category__name = category.name)
-#     context[category.name] = [data_point.display_data() for data_point in data_points]
