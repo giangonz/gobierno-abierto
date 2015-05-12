@@ -9,37 +9,6 @@ from django.db import models
 from django.core.urlresolvers import reverse
 
 
-# Quick hack to see colors on cards
-category_colors = {
-    u'Desarrollo e Infraestructura': '#80cbc4',
-    u'Transportación': '#e6ee9c',
-    u'Turismo': '#ffe082',
-    u'Economía y Finanzas': '#c5e1a5',
-    u'Salud': '#ef9a9a',
-    u'Educación': '#ffcc80',
-    u'Negocios y Corporaciones': '#ffab91',
-    u'Familia y Servicio Social': '#fff59d',
-    u'Tecnologias': '#9fa8da',
-    u'Permisos y Ambiente': '#a5d6a7',
-    u'Seguridad Pública': '#b0bec5',
-}
-
-# Quick hack to see icons on cards
-category_icons = {
-    u'Desarrollo e Infraestructura': 'images/lightbulb.svg',
-    u'Transportación': 'images/traffic-light.svg',
-    u'Turismo': 'images/white-balance-sunny.svg',
-    u'Economía y Finanzas': 'images/cash.svg',
-    u'Salud': 'images/hospital.svg',
-    u'Educación': 'images/school.svg',
-    u'Negocios y Corporaciones': 'images/wallet-travel.svg',
-    u'Familia y Servicio Social': 'images/human.svg ',
-    u'Tecnologias': 'images/laptop.svg',
-    u'Permisos y Ambiente': 'images/file-document-box.svg',
-    u'Seguridad Pública': 'images/security.svg',
-}
-
-
 class BaseModel(models.Model):
     enabled = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -57,16 +26,18 @@ class BaseModel(models.Model):
 
 
 class Category(BaseModel):
-    name = models.CharField(max_length=100, verbose_name='category')
+    name = models.CharField(max_length=100, verbose_name='category', blank=False, null=False)
+    color = models.CharField(max_length=100, verbose_name='color', blank=False, null=False)
+    icon = models.CharField(max_length=100, verbose_name='icon', blank=False, null=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s' % self.name
 
-    def get_icon(self):
-        return category_icons[self.name]
-
     def get_color(self):
-        return category_colors[self.name]
+        return u'%s' % self.color
+
+    def get_icon(self):
+        return u'%s' % self.icon
 
     def get_absolute_url(self):
         return reverse('category', kwargs={'slug': self.slug})
@@ -85,18 +56,19 @@ class Category(BaseModel):
 
 
 class DataPoint(BaseModel):
-    name = models.CharField(max_length=100, verbose_name='data point')
-    category = models.ForeignKey('Category', verbose_name='category')
-    resource = models.URLField(max_length=200)
-    date_field = models.CharField(max_length=100, verbose_name='date field')
-    data_field = models.CharField(max_length=100, verbose_name='data field')
+    name = models.CharField(max_length=100, verbose_name='data point', blank=False, null=False)
+    category = models.ForeignKey('Category', verbose_name='category', blank=False, null=False)
+    resource = models.URLField(max_length=200, blank=False, null=False)
+    date_field = models.CharField(max_length=100, verbose_name='date field', blank=False, null=False)
+    data_field = models.CharField(max_length=100, verbose_name='data field', blank=False, null=False)
     # action = models.ForeignKey('Action', verbose_name='action')
     # Is it a good thing that this stat went up? Unemployment went up? Bad! Labor participation went up? Good!
     # Used for stat color
-    trend_upwards_positive = models.BooleanField(default=False, verbose_name='upward trend positive?')
-    featured = models.BooleanField(default=False, verbose_name='featured set?')
+    trend_upwards_positive = models.BooleanField(default=False, verbose_name='upward trend positive?',
+                                                 blank=False, null=False)
+    featured = models.BooleanField(default=False, verbose_name='featured set?', blank=False, null=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return u'%s' % self.name
 
     @staticmethod
@@ -157,14 +129,9 @@ class DataPoint(BaseModel):
 
             return {'data': self.name, 'data_set': data_set, 'latest_month': latest_month,
                     'previous_month': previous_month, 'month_last_year': month_last_year,
-                    'category_color': category_colors[self.category.name],
-                    'category_icon': category_icons[self.category.name], 'percent_change': abs(percent_change),
-                    'trend_direction': trend_direction, 'trend_positive': trend_positive}
-
-            # return {'data': self.name, 'data_set': data_set, 'latest_month': latest_month,
-            #         'previous_month': previous_month, 'month_last_year': month_last_year,
-            #         'percent_change': abs(percent_change), 'trend_direction': trend_direction,
-            #         'trend_positive': trend_positive}
+                    'category_color': self.category.color, 'category_icon': self.category.icon,
+                    'percent_change': abs(percent_change), 'trend_direction': trend_direction,
+                    'trend_positive': trend_positive}
 
         except ValueError:
             return 'Incorrect date format'
@@ -191,12 +158,8 @@ class DataPoint(BaseModel):
 
             return {'data': self.name, 'latest_month': latest_month, 'percent_change': abs(percent_change),
                     'trend_direction': trend_direction, 'trend_positive': trend_positive,
-                    'category': self.category, 'category_color': category_colors[self.category.name],
-                    'category_icon': category_icons[self.category.name]}
-
-            # return {'data': self.name, 'latest_month': latest_month, 'percent_change': abs(percent_change),
-            #         'trend_direction': trend_direction, 'trend_positive': trend_positive,
-            #         'category': self.category}
+                    'category': self.category, 'category_color': self.category.color,
+                    'category_icon': self.category.icon}
 
         except ValueError:
             return 'Incorrect date format'
@@ -205,11 +168,11 @@ class DataPoint(BaseModel):
 
 
 class EmbeddedVisualization(BaseModel):
-    name = models.CharField(max_length=100)
-    category = models.ForeignKey('Category', verbose_name='category')
-    embedded = models.TextField()
+    name = models.CharField(max_length=100, blank=False, null=False)
+    category = models.ForeignKey('Category', verbose_name='category', blank=False, null=False)
+    embedded = models.TextField(blank=False, null=False)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def get_absolute_url(self):

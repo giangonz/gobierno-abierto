@@ -6,7 +6,7 @@ from .models import Category, DataPoint, EmbeddedVisualization
 class CategoryForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = ['name', 'slug', 'enabled', 'date_disabled']
+        fields = ['name', 'slug', 'color', 'icon', 'enabled', 'date_disabled']
 
 
 class CategoryAdmin(admin.ModelAdmin):
