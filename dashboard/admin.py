@@ -14,7 +14,6 @@ class CategoryAdmin(admin.ModelAdmin):
     form = CategoryForm
     list_display = ('name', 'enabled')
     list_filter = ('name', 'enabled')
-    view_on_site = False
 
     prepopulated_fields = {'slug': ('name', )}
 
@@ -26,9 +25,6 @@ class CategoryAdmin(admin.ModelAdmin):
         else:
             self.exclude = ['date_disabled']
         return super(CategoryAdmin, self).get_form(request, obj, **kwargs)
-
-    # def view_on_site(self, obj):
-    #     return reverse('category', kwargs={'slug': obj.slug})
 
 
 class DataPointForm(forms.ModelForm):
