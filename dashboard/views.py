@@ -1,12 +1,17 @@
 from django.core.urlresolvers import reverse
+from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
-from .models import Category, DataPoint, EmbeddedVisualization
+
 from requests_oauthlib import OAuth2Session
 from oauthlib.oauth2.rfc6749.errors import MissingTokenError
-import logging
+
+from .models import Category, DataPoint, EmbeddedVisualization
+
 from dashboard_gobernacion.settings import CLIENT_ID, CLIENT_SECRET, AUTHORIZE_URL, TOKEN_URL
+
+import logging
 
 
 class SocrataAccessError(Exception):
@@ -37,14 +42,23 @@ def home_view(request):
         token = '123'
 
         context = {}
+        clean_data = []
 
         data_points = DataPoint.objects.filter(featured=True).order_by('name')
+
         summary_data = [data_point.display_summary(token) for data_point in data_points]
 
         if 403 in summary_data:
             raise SocrataAccessError('Socrata 403 or 404 Access Error')
 
-        context['summary'] = sorted(summary_data, key=lambda item: item['latest_month']['date'], reverse=True)
+        for i in summary_data:
+            if 'error' in i:
+                messages.add_message(request, messages.WARNING, '%s for %s data point, please correct' % (i['error'],
+                                                                                                          i['name']))
+            else:
+                clean_data.append(i)
+
+        context['summary'] = sorted(clean_data, key=lambda item: item['latest_month']['date'], reverse=True)
 
         return render_to_response('home.html', context, context_instance=RequestContext(request))
 
@@ -62,6 +76,7 @@ def category_view(request, slug):
 
         context = {}
         table_data = {}
+        clean_data = []
 
         category = Category.objects.get(slug=slug)
 
@@ -69,7 +84,16 @@ def category_view(request, slug):
         category = Category.objects.get(pk=category.pk)
         context['category'] = category
 
-        table_data[category.name] = [data_point.display_data(token) for data_point in data_points]
+        category_data = [data_point.display_data(token) for data_point in data_points]
+
+        for i in category_data:
+            if 'error' in i:
+                messages.add_message(request, messages.WARNING, '%s for %s data point, please correct' % (i['error'],
+                                                                                                          i['name']))
+            else:
+                clean_data.append(i)
+
+        table_data[category.name] = clean_data
         context['table'] = table_data
 
         return render_to_response('table.html', context, context_instance=RequestContext(request))

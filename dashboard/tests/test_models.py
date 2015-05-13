@@ -162,7 +162,8 @@ class DataPointModelTest(TestCase):
                       body=self.bad_test_data, status=200, content_type='application/json')
 
         r = DataPoint.display_data(data_point_, token={'access_token': '123abc'})
-        self.assertEqual('Incorrect date format', r)
+        self.assertDictEqual({'name': data_point_.name}, {'name': r['name']})
+        self.assertRaisesMessage(expected_exception=ValueError, expected_message='Incorrect date format')
 
     @responses.activate
     def test_display_summary_ok(self):
@@ -206,7 +207,8 @@ class DataPointModelTest(TestCase):
                       body=self.bad_test_data, status=200, content_type='application/json')
 
         r = DataPoint.display_data(data_point_, token={'access_token': '123abc'})
-        self.assertEqual('Incorrect date format', r)
+        self.assertDictEqual({'name': data_point_.name}, {'name': r['name']})
+        self.assertRaisesMessage(expected_exception=ValueError, expected_message='Incorrect date format')
 
 
 class EmbeddedVisualizationModelTest(TestCase):

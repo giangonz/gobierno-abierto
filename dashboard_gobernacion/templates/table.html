@@ -12,6 +12,15 @@
 {% block bootstrap3_content %}
     <div class="container" id="table-container">
         <br>
+        {% if messages %}
+            <div class="alert alert-danger" role="alert">
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
         {% for k, v in table.items %}
             <h1> <img src="{% static category.get_icon %}"> {{ k }}</h1>
             <br>
@@ -29,32 +38,38 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for data in v %}
-                            <tr>
-                                <td>{{ data.data }}</td>
-                                <td>{{ data.latest_month.date|date:"m/Y" }}</td>
-                                <td>{{ data.latest_month.value }} -
-                                    {{ data.percent_change }}%
-                                    {% if data.trend_direction %}
-                                        {% if data.trend_positive %}
-                                            <img src="{% static "images/arrow-up-green.svg" %}">
+                        {% if v %}
+                            {% for data in v %}
+                                <tr>
+                                    <td>{{ data.data }}</td>
+                                    <td>{{ data.latest_month.date|date:"m/Y" }}</td>
+                                    <td>{{ data.latest_month.value }} -
+                                        {{ data.percent_change }}%
+                                        {% if data.trend_direction %}
+                                            {% if data.trend_positive %}
+                                                <img src="{% static "images/arrow-up-green.svg" %}">
+                                            {% else %}
+                                                <img src="{% static "images/arrow-up-red.svg" %}">
+                                            {% endif %}
                                         {% else %}
-                                            <img src="{% static "images/arrow-up-red.svg" %}">
+                                            {% if data.trend_positive %}
+                                                <img src="{% static "images/arrow-down-red.svg" %}">
+                                            {% else %}
+                                                <img src="{% static "images/arrow-down-green.svg" %}">
+                                            {% endif %}
                                         {% endif %}
-                                    {% else %}
-                                        {% if data.trend_positive %}
-                                            <img src="{% static "images/arrow-down-red.svg" %}">
-                                        {% else %}
-                                            <img src="{% static "images/arrow-down-green.svg" %}">
-                                        {% endif %}
-                                    {% endif %}
-                                </td>
-                                <td>{{ data.previous_month.date|date:"m/Y" }}</td>
-                                <td>{{ data.previous_month.value }}</td>
-                                <td>{{ data.month_last_year.date|date:"m/Y" }}</td>
-                                <td>{{ data.month_last_year.value }}</td>
-                            </tr>
-                        {% endfor %}
+                                    </td>
+                                    <td>{{ data.previous_month.date|date:"m/Y" }}</td>
+                                    <td>{{ data.previous_month.value }}</td>
+                                    <td>{{ data.month_last_year.date|date:"m/Y" }}</td>
+                                    <td>{{ data.month_last_year.value }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                            <ul>
+                                <li><a href="/"><strong>There are no data points. Please add in admin.</strong></a></li>
+                            </ul>
+                        {% endif %}
                     </tbody>
                 </table>
             </div>

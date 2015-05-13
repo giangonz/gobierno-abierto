@@ -27,8 +27,8 @@ class BaseModel(models.Model):
 
 class Category(BaseModel):
     name = models.CharField(max_length=100, verbose_name='category', blank=False, null=False)
-    color = models.CharField(max_length=100, verbose_name='color', blank=False, null=False)
-    icon = models.CharField(max_length=100, verbose_name='icon', blank=False, null=False)
+    color = models.CharField(max_length=100, verbose_name='color', blank=False, null=False, default='#c0c0c0')
+    icon = models.CharField(max_length=100, verbose_name='icon', blank=False, null=False, default='images/human.svg')
 
     def __str__(self):
         return u'%s' % self.name
@@ -134,9 +134,11 @@ class DataPoint(BaseModel):
                     'trend_positive': trend_positive}
 
         except ValueError:
-            return 'Incorrect date format'
+            return {'error': ValueError('Incorrect date format'), 'name': self.name}
         except ArithmeticError:
-            return 'Incorrect calculation'
+            return {'error': ArithmeticError('Incorrect calculation'), 'name': self.name}
+        except Exception:
+            return {'error': 'Configuration error', 'name': self.name}
 
     def display_summary(self, token):
         try:
@@ -162,9 +164,11 @@ class DataPoint(BaseModel):
                     'category_icon': self.category.icon}
 
         except ValueError:
-            return 'Incorrect date format'
+            return {'error': ValueError('Incorrect date format'), 'name': self.name}
         except ArithmeticError:
-            return 'Incorrect calculation'
+            return {'error': ArithmeticError('Incorrect calculation'), 'name': self.name}
+        except Exception:
+            return {'error': 'Configuration error', 'name': self.name}
 
 
 class EmbeddedVisualization(BaseModel):

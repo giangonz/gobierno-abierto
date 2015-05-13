@@ -15,34 +15,49 @@
     <div class="container" id="grid-container">
         <h1>Dashboard Summary</h1>
         <div class="row">
-            {% for data in summary %}
-                <div class="col-md-3" style="background-color: {{ data.category_color }}">
-                    <div class="col-md-12">
-                        <h4>{{ data.data }}</h4>
-                        <p>{{ data.latest_month.value|intcomma }}</p>
-                        <p>{{ data.latest_month.date|date:"m/Y" }}</p>
-                        <p>
-                            {{ data.percent_change }}%
-                            {% if data.trend_direction %}
-                                {% if data.trend_positive %}
-                                    <img src="{% static "images/arrow-up-green.svg" %}">
-                                {% else %}
-                                    <img src="{% static "images/arrow-up-red.svg" %}">
-                                {% endif %}
-                                 aumento del mismo mes del año pasado
-                            {% else %}
-                                {% if data.trend_positive %}
-                                    <img src="{% static "images/arrow-down-red.svg" %}">
-                                {% else %}
-                                    <img src="{% static "images/arrow-down-green.svg" %}">
-                                {% endif %}
-                                 redución del mismo mes del año pasado
-                            {% endif %}
-                        </p>
-                    </div>
-                    <img src="{% static data.category_icon %}"> <a href="{% url 'category' data.category.slug %}"> {{ data.category }} </a>
+            {% if messages %}
+                <div class="alert alert-danger" role="alert">
+                    <ul class="messages">
+                        {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
                 </div>
-            {% endfor %}
+            {% endif %}
+            {% if summary %}
+                {% for data in summary %}
+                    <div class="col-md-3" style="background-color: {{ data.category_color }}">
+                        <div class="col-md-12">
+                            <h4>{{ data.data }}</h4>
+                            <p>{{ data.latest_month.value|intcomma }}</p>
+                            <p>{{ data.latest_month.date|date:"m/Y" }}</p>
+                            <p>
+                                {{ data.percent_change }}%
+                                {% if data.trend_direction %}
+                                    {% if data.trend_positive %}
+                                        <img src="{% static "images/arrow-up-green.svg" %}">
+                                    {% else %}
+                                        <img src="{% static "images/arrow-up-red.svg" %}">
+                                    {% endif %}
+                                     aumento del mismo mes del año pasado
+                                {% else %}
+                                    {% if data.trend_positive %}
+                                        <img src="{% static "images/arrow-down-red.svg" %}">
+                                    {% else %}
+                                        <img src="{% static "images/arrow-down-green.svg" %}">
+                                    {% endif %}
+                                     redución del mismo mes del año pasado
+                                {% endif %}
+                            </p>
+                        </div>
+                        <img src="{% static data.category_icon %}"> <a href="{% url 'category' data.category.slug %}"> {{ data.category }} </a>
+                    </div>
+                {% endfor %}
+        {% else %}
+            <ul>
+                <li><a href="/"><strong>There are no data points. Please add in admin.</strong></a></li>
+            </ul>
+        {% endif %}
         </div>
     </div>
 {% endblock %}
