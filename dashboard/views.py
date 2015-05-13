@@ -38,8 +38,7 @@ def get_token(request):
 
 def home_view(request):
     try:
-        # token = get_token(request)
-        token = '123'
+        token = get_token(request)
 
         context = {}
         clean_data = []
@@ -71,8 +70,7 @@ def home_view(request):
 
 def category_view(request, slug):
     try:
-        # token = get_token(request)
-        token = '123'
+        token = get_token(request)
 
         context = {}
         table_data = {}

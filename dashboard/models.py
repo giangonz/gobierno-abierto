@@ -100,8 +100,7 @@ class DataPoint(BaseModel):
             data_request = '%s?$select=%s, %s&$order=%s DESC&$limit=13' % (self.resource, self.date_field,
                                                                            self.data_field, self.date_field)
 
-            # headers = {"content-type": "application/json", "Authorization": "OAuth " + token['access_token']}
-            headers = {"content-type": "application/json"}
+            headers = {"content-type": "application/json", "Authorization": "OAuth " + token['access_token']}
 
             r = requests.get(data_request, headers=headers)
             r.raise_for_status()
